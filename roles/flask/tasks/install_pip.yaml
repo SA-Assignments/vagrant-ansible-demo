@@ -1,0 +1,11 @@
+---
+
+# Causes an error if we try and which something that doesn't exist so use this
+# as a workaround.
+- name: Download pip
+  command: "curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py"
+
+- name: Install pip
+  sudo: yes
+  command: "python /tmp/get-pip.py"
+  register: pip_latest_installed

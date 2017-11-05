@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+<div>
+{% for row in results %}
+      <tr>
+      	
+         <td>{{ row }}</td>
+         <td>{{ row[1] }}</td>
+      </tr>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+---
+
+- name: Webapp | Installing Webapp
+  sudo: yes
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - python-apt
+    - python-virtualenv
+    - python-dev 
+    - libffi-dev 
+    - libssl-dev
+    - build-essential
+    - curl
+
+- name: install pip, if necessary
+  include: "{{ role_path }}/tasks/install_pip.yaml"
+
+- name: Flask | Installing Flask
+  # pip: name=flask
+  sudo: yes
+  pip:
+    name: "{{ item }}"          
+  with_items:
+    - flask
+    - pymysql  
+
+- name: install supervisor
+  sudo: yes
+  apt: >
+    name=supervisor
+    update_cache=yes
+    cache_valid_time=300
+    state=present
+
+
+- name: ensure supervisor is running
+  sudo: yes
+  service: name=supervisor state=started enabled=yes
+
+- name: Install supervisor configuration
+  sudo: yes
+  template: >
+    src=templates/flask_supervisor.conf.j2
+    dest=/etc/supervisor/conf.d/flask_supervisor.conf
+  notify: reload supervisor config
+
+
+
+- name: Setup Service Directories
+  sudo: yes
+  file: >
+    state=directory
+    path="{{ item }}"
+    mode=755
+  with_items:
+      - /opt/app
+      - /opt/app/templates
+      - /etc/app
+      - /var/log/app
+
+- name: Copy Flask App
+  sudo: yes
+  copy: 
+    src : app/
+    dest: "{{ app.install_dir }}"
+
+- name: Copy Flask templates
+  sudo: yes
+  copy: 
+    src : templates/
+    dest: "{{ app.install_dir }}/templates/"
+
+- name: Copy Flask Static files
+  sudo: yes
+  copy: 
+    src : static/
+    dest: "{{ app.install_dir }}/static/"
+  
+- name : Deploy Flask App
+  sudo: yes
+  command: chmod 755 "{{ app.install_dir }}/flask_app.py"
+  notify: restart flask app

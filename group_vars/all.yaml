@@ -1,0 +1,12 @@
+---
+
+http_port: 80
+db_user: root
+db_password: hello
+app:
+  owner: vagrant
+  install_dir: /opt/app
+  conf_dir: /etc/app
+  log_dir: /var/log/app
+server_hostname : localhost
+

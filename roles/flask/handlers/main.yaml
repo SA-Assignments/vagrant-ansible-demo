@@ -1,0 +1,9 @@
+---
+
+- name: restart flask app
+  sudo: yes
+  supervisorctl: name=app state=restarted
+
+- name: reload supervisor config
+  sudo: yes
+  command: supervisorctl reload && supervisorctl update
