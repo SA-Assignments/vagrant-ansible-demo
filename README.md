@@ -2,6 +2,9 @@
 
 An all in one playbook to deploy a simple flask app and database using vagrant with Ansible provisioning it
 
+![3-tier-arch-dig][3-tier-arch-dig.png]
+
+
 #### Requirements
 
 - Vagrant 2.x.x
