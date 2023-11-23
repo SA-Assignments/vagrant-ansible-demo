@@ -13,7 +13,7 @@ An all in one playbook to deploy a simple flask app and database using vagrant w
 
 #### To run playbook
 
-    $ git clone https://github.com/sidja/ansible-vagrant-3-tier-architecture.git
+    
     $ cd ansible-vagrant-3-tier-architecture
     $ vagrant up
 
