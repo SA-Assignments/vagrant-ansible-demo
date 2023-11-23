@@ -1,0 +1,213 @@
+
+
+Using Terraform & Ansible :::
+
+
+	IAC Tools :::
+	
+		Ansible 			== CMS 
+		
+		Terraform 			== Infra-structure provisioning 
+		
+		Vagrant 			==> Development - Dev Envrionments
+		
+
+SDLC :::
+	Dev/Test-QA/UAT/Prod/ - AWS/AZ/GCP...
+	
+	Developer ::
+	
+		Dev Environments ==> 
+		
+				Install with all dev tools. 
+				
+				3 - tier appln.
+				
+					Frond-end Layer				VM1 Virtual Box  --> OS  --> Container1
+					Application Layer 			VM2 Virtual Box 		 --> Container2 	
+					Back-End Layer				VM3 Virtual Box			 --> Container3
+				
+		Test Environments ==>
+		
+Vagrant is a tool for building and maintaining portable software development environments. 
+It isolates your project’s dependencies and configuration from your projects without disturbing the tools your application is consuming. 
+You could easily reproduce similar environments on other machines by using the same configuration as your machine.
+
+Basic Concepts in Vagrant
+Before going further, it is important to understand the following basic concepts that are essential to the working of Vagrant.
+
+Provisioners
+Provisioners provide automation for installing different software and configurations. It is useful in cases when you don’t want to install software manually to your machine.
+
+	Ansible -
+	Shell -
+	Python -
+
+
+Providers
+Providers provide basic services that are required to run your machine. Although Vagrant provides support for VirtualBox, Hyper-V and Docker, other providers can also be used through appropriate plugin.
+
+Boxes
+Boxes are Vagrant environment packages that can be copied to any other machine to replicate a similar environment. Vagrant provides a repository of these boxes that can be downloaded, and you can contribute to the list by adding your own customized box.			
+				
+				
+AMI ??
+
+docker images ==> 
+
+Ansible -
+
+Shell -
+Python -
+
+
+Vagrant :::
+
+	1. Install Vagrant
+	2. Ansible 
+
+Output :::
+	
+	install vagrant :::
+	
+		Providers 	--> AWS/AZ/Hyper-V/Virtual-Box/Docker 
+			These are installed as plugins
+			
+		Provisioner --> Ansible 
+			
+	vagrant init 
+	
+	Create Vagrantfile in the project folder.
+	
+	localhost:9090
+	127.0.0.1:9090
+	
+	Vagrantfile ??		ruby Language.
+	
+	vagrant up ==> Used to run the vagrantfile
+	
+		HCL ==> 
+	
+	Ansible Playbooks			*.yaml
+		Using Roles ???
+		
+	- Install nginx 
+		start nginx
+		config nginx 
+				path based routing 	==> www.gmail.com --> www.gmail.com/inbox  --> localhost:9090/db
+				path based routing 	==> localhost:9090/app
+				
+				host based routing  ==> www.gmail.com --> www.inbox.gmail.com
+				
+				www.gmail.com
+				www.gmail.com/inbox 
+				www.gmail.com/sent
+				
+				www.google.com
+				www.maps.google.com 
+				www.translate.google.com/s1 
+				www.translate.google.com/s2
+				www.translate.google.com/s3 
+				www.translate.google.com/s4 
+		
+	in tomcat web application server ::
+				tomcat/webapps ==> *.war
+				
+	in Nginx ::
+	
+		/var/www/html/
+		
+	Java 	==> tomcat 
+	
+	python 	==> Flask -- Web appln framework  
+	
+	roles
+		flask
+		db
+		nginx
+	inventory
+	vagrantfile
+	playbook.yaml
+		
+	
+	Architecture --> 
+
+
+
+
+Install the Plugin
+The first step in the process is to make sure that you have Vagrant installed on your machine. As I mentioned earlier, you could use providers by installing the respective plugins. For the purpose of this tutorial, I will download the vagrant-aws plugin through the following command:
+
+vagrant plugin install vagrant-aws
+
+Next, verify the plugin installation through the command:
+
+vagrant plugin list
+
+The vagrant-aws plugin should be present in the plugins list
+
+Set Up the Vagrant Box
+After installing plugin, the next step is to install a Vagrant box. The problem is that there is no box for AWS provider. To make things work, I recommend you use the dummy box provided by Mitchell Hashimoto.
+
+Run the following command to add the dummy box:
+
+vagrant box add aws https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
+
+Although I have named the box aws, you can give it any name that works for you. Once the process finishes, I am ready to create AWS instances.
+
+Create the Instance
+
+Create the Instance
+Run the vagrant init command to create a vagrant file:
+
+vagrant init
+
+Next, edit the vagrant file as follows:
+
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Require the AWS provider plugin
+require ‘vagrant-aws’
+
+# Creating and configuring the AWS instance
+Vagrant.configure(‘2’) do |config|
+
+# Use dummy AWS box
+config.vm.box = ‘aws’
+
+# Specify configuration of AWS provider
+config.vm.provider ‘aws’ do |aws, override|
+# Read AWS authentication information from environment variables
+aws.access_key_id = ‘ABCR2NDJKZJIAJ5QVXGJK’
+aws.secret_access_key = ‘WAuZE39lKHXAJnCfbZf2y6DzRfeCsPUU/yZMRDWo’
+
+# Specify SSH keypair to use
+aws.keypair_name = ‘vagrant’
+
+# Specify region, AMI ID, Instance and security group
+aws.region = ‘ap-southeast-2’
+aws.ami = ‘ami-14b55f76’
+aws.instance_type = ‘t2.micro’
+aws.security_groups = [‘default’]
+
+# Specify username and private key path
+override.ssh.username = ‘ubuntu’
+override.ssh.private_key_path = ‘~/vagrant/vagrant’	
+
+
+Vagrantfile Explained
+The following list explains the important variables and aspects of the above file:
+
+config.vm.box : Specify the box. Using dummy aws box for AWS deployment
+aws.access_key_id : Access key ID of your Amazon account
+aws.secret_access_key : The secret access key for your Amazon account
+aws.keypair_name : Your SSH keypair in AWS
+aws.region : The AWS region in which you want to create your instance
+aws.ami : The AMI ID you want to use. AMI specifies the information needed to launch a virtual machine within EC2
+aws.instance_type : The AWS instance you want to create
+aws.security_groups : Specify the names of security groups that will be applied to your instance
+override.ssh.username : The username that will be used to access the instance
+override.ssh.private_key_path : The path of your SSH private key
+Launch the Instance
+After configuring the Vagrantfile, I will simply run the vagrant up command. Vagrant will launch an AWS instance through the AWS AMI provided in the configuration using the credentials provided in the Vagrantfile.
